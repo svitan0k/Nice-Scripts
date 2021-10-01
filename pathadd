@@ -1,0 +1,4 @@
+#!/bin/bash
+
+printf '\nexport PATH=\"$PATH:%s\"' $PWD >> $HOME/.bashrc;
+printf 'Added %s to $PATH\n' $PWD;
