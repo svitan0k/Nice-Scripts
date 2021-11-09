@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
+#Counts the number of characters in a string provided as an argument within quotes (") 
 
-#make sure you put your argument in quotes
+import sys
 
 print(len(sys.argv[1]))
