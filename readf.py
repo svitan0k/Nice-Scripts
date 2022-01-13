@@ -33,7 +33,7 @@ def searchInput(tree, userInput):
                             
             except: 
                 # the script reads all files; some of them are not in the text file format
-                # so it give out error:
+                # so it gives out error:
                 # UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
                 # I wanted this script to read both text files formats, those ending with ".txt" and those storred as plain text.
                 continue
