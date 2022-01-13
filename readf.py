@@ -24,7 +24,7 @@ def searchInput(tree, userInput):
                     linecount = 0
                     for line in file:
                         linecount += 1
-                        findWord = re.search(rf'.*{userInput}.*', line)
+                        findWord = re.search(rf'(?i:.*{userInput}.*)', line)
                         if findWord is not None:
                             if str(cwd) in foundFiles:
                                 foundFiles[f'{cwd}'].append((y, linecount))
