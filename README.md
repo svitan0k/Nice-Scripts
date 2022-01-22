@@ -1,2 +1,2 @@
 # Nice-Scripts
-Useful scripts I make for my convenience.
+Useful scripts I write for my convenience.
