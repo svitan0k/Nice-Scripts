@@ -2,16 +2,34 @@
 
 # A script that searches for a word in a ".txt" and plain text files inside a directory tree
 
-import os, re, sys
+import os, re, sys, getopt
 
-cwd = os.getcwd()
 
-tree = os.walk(cwd)
+#path = os.path.abspath("You can specify a permanent path here so you don't have to enter '-d' option each time you run the script.")
+# If you choose to uncomment the above then comment out the 'path' variable below.
 
-if len(sys.argv) > 1:
-    word = sys.argv[1]
-else:
-    word = input("Enter a word to search: ")
+path = None
+word = None # changing the value to 'sys.argv[1]' is especially useful if combined with the 'path' variable above. 
+# Then the script could be used without needing to specify the '-w' and '-d' options since it would only search in one place on a disk. 
+tree = None
+foundFiles = None
+
+# search for any passed arguments
+try:
+    if len(sys.argv) > 1:
+        foundArgs = getopt.getopt(sys.argv[1:], "d:w:")[0]
+        for arg, value in foundArgs:
+            if arg in "-w":
+                word = value
+            elif arg in "-d":
+                if value == "cwd" or value == "pwd":
+                    path = os.getcwd()
+                else:
+                    path = value
+except getopt.error as error:
+    # show error if present
+    print(f"\n-- {str(error)}\n")
+
 
 def searchInput(tree, userInput):
     foundFiles = dict()
@@ -41,9 +59,26 @@ def searchInput(tree, userInput):
                 continue
     return foundFiles
 
-print(f'\nFound input in the following files:\n')
+try:
+    if word is None:
+        word = input("Enter a word to search: ")
 
-foundFiles = searchInput(tree, word)
+    if path is None:
+        path = input("Enter a folder to search: ")
+        if path == "cwd" or path == "pwd" or path == "":
+            path = os.getcwd()
+except:
+    print("\n")
+
+
+if os.path.exists(path):
+    tree = os.walk(path)
+else:
+    print("-- Couldn't find specified path.")
+
+if word and tree:
+    print(f'\nFound input in the following files:\n')
+    foundFiles = searchInput(tree, word)
 
 if foundFiles:
     for z in foundFiles:
@@ -51,4 +86,4 @@ if foundFiles:
         for h in foundFiles[f'{z}']:
             print(f'--- "{h[0]}" on line {h[1]}\n')
 else:
-    print("No matches were found.\n")
+    print("-- No matches were found.\n")
