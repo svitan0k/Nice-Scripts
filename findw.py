@@ -4,6 +4,7 @@
 
 import os, re, sys, getopt
 
+os.system("") # to makes the ANSI escape sequence get processed correctly on Windows
 
 #path = os.path.abspath("You can specify a permanent path here so you don't have to enter '-d' option each time you run the script.")
 # If you choose to uncomment the above then comment out the 'path' variable below.
@@ -41,16 +42,25 @@ def searchInput(tree, userInput):
                     linecount = 0
                     for line in file:
                         linecount += 1
-                        findWord = re.search(rf'(?i:.*{userInput}.*)', line)
-                        if findWord is not None: # if a match to user's input was found 
-                            if str(cwd) in foundFiles: # if the path to the found file is already in the 'foundFiles' dictionary, then append a name of the file (the 'y') and a linecount to the already existing key  
-                                foundFiles[f'{cwd}'].append((y, linecount))
+                        findWord = re.findall(rf'(.*{userInput}.*)', line, re.I) # matches a line with user's input
+                        if findWord is not None and len(findWord) > 0: # if a match to user's input was found
+                            for match in findWord:
+                                line = match.split()
+                                wordcount = 0
+                                for z in line:
+                                    if userInput in z.lower():
+                                        line[wordcount] = '\033[31m' + str(line[wordcount]) +  '\033[0m'
+                                        wordcount += 1
+                                    else:
+                                        wordcount += 1
+                                line = " ".join(line)
+                            if str(cwd) in foundFiles: # if the path to the found file is already in the 'foundFiles' dictionary, then append a name of the file (the 'y') and a linecount to the already existing key
+                                foundFiles[f'{cwd}'].append((y, linecount, line))
                             else: # otherwise, create a new key and assign a name of the the file and a linecount to it
-                                foundFiles[f'{cwd}'] = [(y, linecount)] # value gets initiated as a tuple inside a list, so that if the match is found again in the same folder - which is used as a key in a dictionary - it could be appended to the list which is accessed by that key.
+                                foundFiles[f'{cwd}'] = [(y, linecount, line)] # value gets initiated as a tuple inside a list, so that if the match is found again in the same folder - which is used as a key in a dictionary - it could be appended to the list which is accessed by that key.
                                 #Example:
-                                #{'/mnt/ssd/Users/John/Destop': [(file1, 23), (file2, 68), (file3, 12)]}
-                            
-            except: 
+                                #{'/mnt/ssd/Users/John/Destop': [(file1, 23, '\x1b[31mUserInput\x1b[0m'), (file2, 68, '\x1b[31mUserInput\x1b[0m'), (file3, 12, '\x1b[31mUserInput\x1b[0m')]}
+            except:
                 # the script reads all files; some of them are not in the text file format
                 # so it gives out error:
                 # UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
@@ -77,13 +87,13 @@ else:
     print("-- Couldn't find specified path.")
 
 if word and tree:
-    print(f'\nFound input in the following files:\n')
+    print(f'\n\033[41m——— Found input in the following files: ———\033[0m\n')
     foundFiles = searchInput(tree, word)
 
 if foundFiles:
     for z in foundFiles:
         print(f'{z}:')
         for h in foundFiles[f'{z}']:
-            print(f'--- "{h[0]}" on line {h[1]}\n')
+            print(f'—————— "{h[0]}" on line {h[1]}:\n {h[2]}\n\n')
 else:
     print("-- No matches were found.\n")
