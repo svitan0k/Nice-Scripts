@@ -42,18 +42,21 @@ def searchInput(tree, userInput):
                     linecount = 0
                     for line in file:
                         linecount += 1
-                        findWord = re.findall(rf'(.*{userInput}.*)', line, re.I) # matches a line with user's input
-                        if findWord is not None and len(findWord) > 0: # if a match to user's input was found
-                            for match in findWord:
-                                line = match.split()
+                        findLines = re.findall(rf'(.*{userInput}.*)', line, re.I) # matches a line with user's input
+                        if findLines is not None and len(findLines) > 0: # if a match to user's input was found
+                            for foundLine in findLines:
+                                coloredline = foundLine.split()
                                 wordcount = 0
-                                for z in line:
-                                    if userInput in z.lower():
-                                        line[wordcount] = '\033[31m' + str(line[wordcount]) +  '\033[0m'
-                                        wordcount += 1
+                                for word in foundLine.split():
+                                    if userInput[0].lower() in word.lower(): # 'findLines' regex from above already confirmed that the line contains user's input, so now we just need to find the starting position to color-code the output
+                                        if len(userInput.split()) > 1:
+                                            for wordToColor in coloredline[wordcount:wordcount+len(userInput.split())]:
+                                                coloredline[coloredline.index(wordToColor)] = '\033[31m' + str(wordToColor) + '\033[0m'
+                                        else:
+                                            coloredline[wordcount] = '\033[31m' + str(coloredline[wordcount]) +  '\033[0m'
                                     else:
                                         wordcount += 1
-                                line = " ".join(line)
+                                line = " ".join(coloredline)
                             if str(cwd) in foundFiles: # if the path to the found file is already in the 'foundFiles' dictionary, then append a name of the file (the 'y') and a linecount to the already existing key
                                 foundFiles[f'{cwd}'].append((y, linecount, line))
                             else: # otherwise, create a new key and assign a name of the the file and a linecount to it
