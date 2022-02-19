@@ -48,14 +48,29 @@ def searchInput(tree, userInput):
                                 coloredline = foundLine.split()
                                 wordcount = 0
                                 for word in foundLine.split():
-                                    if userInput[0].lower() in word.lower(): # 'findLines' regex from above already confirmed that the line contains user's input, so now we just need to find the starting position to color-code the output
-                                        if len(userInput.split()) > 1:
-                                            for wordToColor in coloredline[wordcount:wordcount+len(userInput.split())]:
-                                                coloredline[coloredline.index(wordToColor)] = '\033[31m' + str(wordToColor) + '\033[0m'
+                                    if len(userInput.split()) > 1: # "if there is more then one word in user's input"
+                                        if userInput.lower().split()[0] in word.lower(): # 'findLines' regex from above already confirmed that the line contains user's input, so now we just need to find the starting position, check if the words after that position match the rest of user's input, and color-code the output
+                                            joinedUncoloredLine = " ".join(foundLine.lower().split()[wordcount:wordcount+len(userInput.split())])
+                                            joinedUserInput = " ".join(userInput.lower().split())
+                                            if joinedUserInput == joinedUncoloredLine: # if it's a full match
+                                                coloredline[wordcount:wordcount+len(userInput.split())] = ['\033[31m' + x +'\033[0m' for x in coloredline[wordcount:wordcount+len(userInput.split())]]
+                                                wordcount += 1
+                                            elif joinedUserInput in joinedUncoloredLine: # if it's a partial match
+                                                coloredline[wordcount:wordcount+len(userInput.split())] = ['\033[33m' + x +'\033[0m' for x in coloredline[wordcount:wordcount+len(userInput.split())]]
+                                                wordcount += 1
+                                            else:
+                                                wordcount += 1
                                         else:
-                                            coloredline[wordcount] = '\033[31m' + str(coloredline[wordcount]) +  '\033[0m'
+                                            wordcount += 1
                                     else:
-                                        wordcount += 1
+                                        if userInput.lower() == word.lower(): # full match
+                                            coloredline[wordcount] = '\033[31m' + coloredline[wordcount] +  '\033[0m'
+                                            wordcount += 1
+                                        elif userInput.lower() in word.lower(): # partial match
+                                            coloredline[wordcount] = '\033[33m' + coloredline[wordcount] +  '\033[0m'
+                                            wordcount += 1
+                                        else:
+                                            wordcount += 1
                                 line = " ".join(coloredline)
                             if str(cwd) in foundFiles: # if the path to the found file is already in the 'foundFiles' dictionary, then append a name of the file (the 'y') and a linecount to the already existing key
                                 foundFiles[f'{cwd}'].append((y, linecount, line))
